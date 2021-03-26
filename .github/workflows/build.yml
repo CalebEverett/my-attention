@@ -15,7 +15,7 @@ jobs:
         node-version: '14.x'
     - name: Install dependencies and build
       run: |
-        yarn --frozen-lockfile
+        yarn install
         yarn build
     - name: Zip build and release
       run: |
