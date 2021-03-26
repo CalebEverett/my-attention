@@ -24,8 +24,8 @@ jobs:
       with:
         tag: v0.0.1
         commit: master
-        draft: true
         artifacts: "release.zip"
+        replacesArtifacts: true
         token: ${{ secrets.GITHUB_TOKEN }}
 
     
