@@ -18,7 +18,7 @@ jobs:
         yarn install
         yarn build
     - name: Zip build folder and release
-      run: zip -r build.zip build
+      run: zip -r release.zip build
     - name: Release zip
       uses: ncipollo/release-action@v1
       with:
