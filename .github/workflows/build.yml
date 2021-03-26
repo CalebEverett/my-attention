@@ -18,6 +18,14 @@ jobs:
         yarn install
         yarn build
     - name: Zip build folder and release
-      run: |
-        zip -r build.zip build
-        echo "Release"
+      run: zip -r build.zip build
+    - name: Release zip
+    - uses: ncipollo/release-action@v1
+      with:
+        tag: v0.0.1
+        commit: master
+        draft: true
+        artifacts: "release.zip"
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    
