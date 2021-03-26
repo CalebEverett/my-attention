@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Button, Divider, Input, Row, Table, Tabs } from 'antd';
+import { Button, Card, Col, Divider, Input, Row, Table, Tabs } from 'antd';
 import Highlighter from "react-highlight-words";
 import 'antd/dist/antd.css';
 
@@ -121,31 +121,53 @@ class App extends Component {
           <h1 className="App-title">my attention</h1>
         </header>
         <Divider orientation="left"></Divider>
-        <Row justify="start">
+        <Row justify="space-around">
           <Button type="primary" onClick={this.handleHighlightLinks} ghost={!this.state.highlight}>Highlight</Button>
+          <Button type="primary" ghost={true}>Block Ads</Button>
+          <Button type="primary" ghost={true}>Previous Only</Button>
         </Row>
         <Divider orientation="left"></Divider>
         <Row justify="start">
-          <Tabs defaultActiveKey="history">
-            <TabPane tab="Statistics" key="stats">
-              <p>Hello Mellow</p>
-            </TabPane>
-            <TabPane tab="History" key="history">
-              <Input.Search
-                placeholder="Search..."
-                onChange={e => this.search(e.target.value)}
-              />
-              <Table
-                columns={this.columns}
-                dataSource={filteredHistory ? filteredHistory : history}
-                size="small"
-                onChange={this.onChange}
-                pagination={{ defaultPageSize: 50 }}
-                width='400px'
-              >
-              </Table>
-            </TabPane>
-          </Tabs>
+          <Col span={24}>
+            <Tabs defaultActiveKey="statistics">
+              <TabPane tab="Statistics" key="stats">
+                <p>Key stats for day, week, month, year.</p>
+                <Divider>Time</Divider>
+                <p>Total active browser time</p>
+                <p>Total time searching</p>
+                <p>Total time consuming content</p>
+                <Divider>Content</Divider>
+                <p>Total pages viewed</p>
+                <p>Total pages viewed not bounced</p>
+                <p>Total new pages viewed not bounced</p>
+                <p>Total previously visited pages viewed not bounced</p>
+                <p>Total Tabs opened</p>
+                <p>Average time per active tab</p>
+                <Divider>Search</Divider>
+                <p>Bounce rate</p>
+                <p>Total searches</p>
+                <p>Total clicks</p>
+                <p>Total bounce clicks</p>
+                <p>Total not bounced clicks</p>
+                <p>Average clicks per search</p>
+              </TabPane>
+              <TabPane tab="History" key="history">
+                <Input.Search
+                  placeholder="Search..."
+                  onChange={e => this.search(e.target.value)}
+                />
+                <Table
+                  columns={this.columns}
+                  dataSource={filteredHistory ? filteredHistory : history}
+                  size="small"
+                  onChange={this.onChange}
+                  pagination={{ defaultPageSize: 50 }}
+                  width='400px'
+                >
+                </Table>
+              </TabPane>
+            </Tabs>
+          </Col>
         </Row>
       </div >
     );
