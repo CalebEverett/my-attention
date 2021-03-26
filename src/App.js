@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Button, Card, Col, Divider, Input, Row, Table, Tabs } from 'antd';
+import { Button, Col, Divider, Input, Row, Table, Tabs } from 'antd';
 import Highlighter from "react-highlight-words";
 import 'antd/dist/antd.css';
 
@@ -117,6 +117,7 @@ class App extends Component {
     { title: "Month", key: 'month' },
     { title: "Year", key: 'year' },
   ]
+
 
   dummy_data = [
     {
