@@ -26,6 +26,7 @@ jobs:
         commit: master
         artifacts: "release.zip"
         replacesArtifacts: true
+        allowUpdates: true
         token: ${{ secrets.GITHUB_TOKEN }}
 
     

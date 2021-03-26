@@ -1,4 +1,9 @@
+[![build status](https://github.com/CalebEverett/my-attention/actions/workflows/build.yml/badge.svg)](https://github.com/CalebEverett/my-attention/actions/workflows/build.yml)
+
 ## Installation
+If you just want to install the extension without the code for development, you can download `release.zip` from the [latest release](https://github.com/CalebEverett/my-attention/releases) and then skip to the next section to for instructions on adding the extension to Chrome.
+
+## Development
 >Make sure you have latest **NodeJs** version installed
 
 Clone repo
