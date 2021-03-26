@@ -65,12 +65,13 @@ const toggleHighlight = (highlight) => {
       message: "get_history",
     },
     (response) => {
-      const domains = [];
+      const pages = [];
 
       for (var h of response.history) {
-        const url = new URL(h.url);
-        if (!domains.includes(url.hostname)) {
-          domains.push(url.hostname);
+        const url = new URL(h.url)
+        const page = url.protocol + "//" + url.pathname
+        if (!pages.includes(page)) {
+          pages.push(page);
         };
       };
 
@@ -79,7 +80,8 @@ const toggleHighlight = (highlight) => {
       for (var el of anchors) {
 
         try {
-          if (domains.includes(el.hostname) && el.hostname.indexOf('google') === -1) {
+          const link = el.protocol + "//" + el.pathname
+          if (pages.includes(link)) {
             el.style.backgroundColor = color
           }
         }

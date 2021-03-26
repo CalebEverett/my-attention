@@ -11,12 +11,15 @@ chrome.browserAction.onClicked.addListener(
       return true
    });
 
+
+const historyStart = Date.now() - 365 * 24 * 60 * 60 * 1000
+
 chrome.runtime.onMessage.addListener(
    function (request, sender, sendResponse) {
       console.log(request.message);
       switch (request.message) {
          case "get_history":
-            chrome.history.search({ text: '', startTime: 1612998413443 - 30 * 24 * 60 * 60 * 100, maxResults: 500 },
+            chrome.history.search({ text: '', startTime: historyStart, maxResults: 500 },
                function (data) { sendResponse({ history: data }) });
             break;
          case "toggle_highlights":
@@ -31,3 +34,9 @@ chrome.runtime.onMessage.addListener(
       return true
    }
 );
+
+chrome.history.search({ text: '', startTime: historyStart, maxResults: 1 },
+   function (data) {
+      const url = new URL(data[0].url);
+      console.log({ 'pathname': url.pathname });
+   });

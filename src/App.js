@@ -12,7 +12,7 @@ const { TabPane } = Tabs;
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { history: null, filteredHistory: null, searchTerm: null, highlight: false };
+    this.state = { history: null, filteredHistory: null, searchTerm: null, highlight: false, visitCounts: null };
   };
 
   getHistory = () => {
@@ -31,9 +31,30 @@ class App extends Component {
           visits: item.visitCount,
           last: item.lastVisitTime
         }));
-        this.setState({ history: data })
+        this.setState({ history: data });
+        this.getPageCounts();
+        console.log(this.state);
       }
     );
+
+  };
+
+  getPageCounts = () => {
+    const visitCounts = { day: 0, week: 0, month: 0, year: 0 }
+
+    const day = Date.now() - 1000 * 60 * 60 * 24;
+    const week = Date.now() - 1000 * 60 * 60 * 24 * 7;
+    const month = Date.now() - 1000 * 60 * 60 * 24 * 30;
+    const year = Date.now() - 1000 * 60 * 60 * 24 * 365;
+
+    this.state.history.forEach(h => {
+      if (h.last > day) { visitCounts.day += h.visits; };
+      if (h.last > week) { visitCounts.week += h.visits; };
+      if (h.last > month) { visitCounts.month += h.visits; };
+      if (h.last > year) { visitCounts.year += h.visits; };
+    });
+
+    this.setState({ visitCounts })
 
   };
 
@@ -89,6 +110,24 @@ class App extends Component {
     },
   ]
 
+  content_columns = [
+    { title: "Statistic", key: 'stat' },
+    { title: "Day", key: 'day' },
+    { title: "Week", key: 'week' },
+    { title: "Month", key: 'month' },
+    { title: "Year", key: 'year' },
+  ]
+
+  dummy_data = [
+    {
+      stat: "Total pages viewed",
+      day: 100,
+      week: 1000,
+      month: 2000,
+      year: 3000,
+    }
+  ]
+
   search = searchTerm => {
     const { history } = this.state;
     console.log("PASS", { searchTerm });
@@ -137,11 +176,18 @@ class App extends Component {
                 <p>Total time searching</p>
                 <p>Total time consuming content</p>
                 <Divider>Content</Divider>
+                <Table
+                  columns={this.content_columns}
+                  datasource={this.dummy_data}
+                  size="small"
+                  width='400px'
+                >
+                </Table>
                 <p>Total pages viewed</p>
                 <p>Total pages viewed not bounced</p>
                 <p>Total new pages viewed not bounced</p>
                 <p>Total previously visited pages viewed not bounced</p>
-                <p>Total Tabs opened</p>
+                <p>Total tabs opened</p>
                 <p>Average time per active tab</p>
                 <Divider>Search</Divider>
                 <p>Bounce rate</p>
