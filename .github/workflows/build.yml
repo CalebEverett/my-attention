@@ -20,6 +20,7 @@ jobs:
     - name: Zip build folder and release
       run: zip -r build.zip build
     - name: Release zip
+    - uses: actions/checkout@v1
     - uses: ncipollo/release-action@v1
       with:
         tag: v0.0.1
