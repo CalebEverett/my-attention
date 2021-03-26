@@ -356,4 +356,7 @@ module.exports = {
     tls: 'empty',
     child_process: 'empty',
   },
+  performance: {
+    hints: false,
+  },
 };

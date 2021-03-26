@@ -17,7 +17,7 @@ jobs:
       run: |
         yarn install
         yarn build
-    - name: Zip build and release
+    - name: Zip build folder and release
       run: |
         zip -r build.zip build
         echo "Release"
