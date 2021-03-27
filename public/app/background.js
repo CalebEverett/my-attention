@@ -75,7 +75,7 @@ const getContentData = () => {
 };
 
 const contentData = {};
-getContentData()
+getContentData();
 
 chrome.runtime.onMessage.addListener(
    function (request, sender, sendResponse) {

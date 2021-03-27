@@ -23,7 +23,7 @@ jobs:
       if: true
       uses: ncipollo/release-action@v1
       with:
-        tag: v0.0.2
+        tag: v0.0.3
         commit: master
         artifacts: "release.zip"
         token: ${{ secrets.GITHUB_TOKEN }}
