@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Button, Col, Divider, Input, Row, Table, Tabs } from 'antd';
+import { Col, Divider, Input, Row, Switch, Table, Tabs } from 'antd';
 import Highlighter from "react-highlight-words";
 import 'antd/dist/antd.css';
 
@@ -12,7 +12,10 @@ const { TabPane } = Tabs;
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { history: null, filteredHistory: null, searchTerm: null, highlight: false, visitCounts: null };
+    this.state = {
+      history: null, filteredHistory: null, searchTerm: null,
+      highlight: false, contentData: {}, timeData: {}, searchData: {}
+    };
   };
 
   getHistory = () => {
@@ -32,15 +35,20 @@ class App extends Component {
           last: item.lastVisitTime
         }));
         this.setState({ history: data });
-        this.getPageCounts();
-        console.log(this.state);
+        this.getContentStats();
+        this.getTimeStats();
+        this.getSearchStats();
       }
     );
 
   };
 
-  getPageCounts = () => {
-    const visitCounts = { day: 0, week: 0, month: 0, year: 0 }
+  statRow = (key, stat, day = 0, week = 0, month = 0, year = 0) => {
+    return { key, stat, day, week, month, year }
+  };
+
+  getContentStats = () => {
+    const pageCounts = this.statRow('pageCounts', "Total pages viewed")
 
     const day = Date.now() - 1000 * 60 * 60 * 24;
     const week = Date.now() - 1000 * 60 * 60 * 24 * 7;
@@ -48,25 +56,69 @@ class App extends Component {
     const year = Date.now() - 1000 * 60 * 60 * 24 * 365;
 
     this.state.history.forEach(h => {
-      if (h.last > day) { visitCounts.day += h.visits; };
-      if (h.last > week) { visitCounts.week += h.visits; };
-      if (h.last > month) { visitCounts.month += h.visits; };
-      if (h.last > year) { visitCounts.year += h.visits; };
+      if (h.last > day) { pageCounts.day += h.visits; };
+      if (h.last > week) { pageCounts.week += h.visits; };
+      if (h.last > month) { pageCounts.month += h.visits; };
+      if (h.last > year) { pageCounts.year += h.visits; };
     });
 
-    this.setState({ visitCounts })
+    const contentData = this.state.contentData
+
+    contentData.pageCounts = pageCounts
+
+    const contentPlaceHolders = [
+      this.statRow('pagesNotBounced', "Pages viewed not bounced"),
+      this.statRow('newPages', "New pages viewed not bounced"),
+      this.statRow('oldPages', "Previously visited pages viewed not bounced"),
+      this.statRow('tabsOpened', "Tabs opened"),
+      this.statRow('avgTimePerTab', "Average active time per active")
+    ]
+
+    contentPlaceHolders.forEach(row => { contentData[row.key] = row })
+
+    this.setState({ contentData })
 
   };
 
-  handleHighlightLinks = () => {
+  getTimeStats = () => {
+    const timeData = this.state.timeData
+
+    const timePlaceHolders = [
+      this.statRow('browserTime', "Active browser time"),
+      this.statRow('timeSearch', "Time searching"),
+      this.statRow('timeContent', "Time consuming content"),
+    ]
+
+    timePlaceHolders.forEach(row => { timeData[row.key] = row })
+
+    this.setState({ timeData })
+  };
+
+  getSearchStats = () => {
+    const searchData = this.state.searchData
+
+    const searchPlaceHolders = [
+      this.statRow('bounceRate', "Bounce rate"),
+      this.statRow('searches', "Total searches"),
+      this.statRow('clicks', "Total clicks"),
+      this.statRow('bounceClicks', "Bounce clicks"),
+      this.statRow('notBounceClicks', "Not bounced clicks"),
+      this.statRow('clicksPerSearch', "Average clicks per search"),
+    ]
+
+    searchPlaceHolders.forEach(row => { searchData[row.key] = row })
+
+    this.setState({ searchData })
+  };
+
+  handleHighlightLinks = (checked) => {
     const message = {
       from: 'app',
       message: "toggle_highlights",
-      highlight: !this.state.highlight
+      highlight: checked
     };
 
-    this.setState({ highlight: !this.state.highlight })
-    console.log(message);
+    this.setState({ highlight: checked })
 
     chrome.runtime.sendMessage(
       message,
@@ -86,7 +138,7 @@ class App extends Component {
     />
   };
 
-  columns = [
+  history_columns = [
     {
       title: 'Link',
       key: 'link',
@@ -110,24 +162,14 @@ class App extends Component {
     },
   ]
 
-  content_columns = [
-    { title: "Statistic", key: 'stat' },
-    { title: "Day", key: 'day' },
-    { title: "Week", key: 'week' },
-    { title: "Month", key: 'month' },
-    { title: "Year", key: 'year' },
+  stats_columns = [
+    { title: "Statistic", key: 'stat', dataIndex: 'stat' },
+    { title: "Day", key: 'day', dataIndex: 'day', align: 'right' },
+    { title: "Week", key: 'week', dataIndex: 'week', align: 'right' },
+    { title: "Month", key: 'month', dataIndex: 'month', align: 'right' },
+    { title: "Year", key: 'year', dataIndex: 'year', align: 'right' },
   ]
 
-
-  dummy_data = [
-    {
-      stat: "Total pages viewed",
-      day: 100,
-      week: 1000,
-      month: 2000,
-      year: 3000,
-    }
-  ]
 
   search = searchTerm => {
     const { history } = this.state;
@@ -148,7 +190,11 @@ class App extends Component {
   }
 
   render() {
-    const { filteredHistory, history } = this.state;
+    const { contentData, filteredHistory, history, searchData, timeData } = this.state;
+    const contentTableData = Object.values(contentData)
+    const timeTableData = Object.values(timeData)
+    const searchTableData = Object.values(searchData)
+
     return (
       <div className="App">
         <header className="App-header">
@@ -160,43 +206,46 @@ class App extends Component {
 
           <h1 className="App-title">my attention</h1>
         </header>
-        <Divider orientation="left"></Divider>
-        <Row justify="space-around">
-          <Button type="primary" onClick={this.handleHighlightLinks} ghost={!this.state.highlight}>Highlight</Button>
-          <Button type="primary" ghost={true}>Block Ads</Button>
-          <Button type="primary" ghost={true}>Previous Only</Button>
+        <Divider>Settings</Divider>
+        <Row justify="start">
+          <Col span={6}>
+            <p>Highlight</p>
+            <Switch onChange={this.handleHighlightLinks}></Switch>
+          </Col>
         </Row>
-        <Divider orientation="left"></Divider>
+        <Divider></Divider>
         <Row justify="start">
           <Col span={24}>
             <Tabs defaultActiveKey="statistics">
               <TabPane tab="Statistics" key="stats">
-                <p>Key stats for day, week, month, year.</p>
                 <Divider>Time</Divider>
-                <p>Total active browser time</p>
-                <p>Total time searching</p>
-                <p>Total time consuming content</p>
-                <Divider>Content</Divider>
                 <Table
-                  columns={this.content_columns}
-                  datasource={this.dummy_data}
+                  columns={this.stats_columns}
+                  dataSource={timeTableData}
                   size="small"
                   width='400px'
+                  pagination={false}
                 >
                 </Table>
-                <p>Total pages viewed</p>
-                <p>Total pages viewed not bounced</p>
-                <p>Total new pages viewed not bounced</p>
-                <p>Total previously visited pages viewed not bounced</p>
-                <p>Total tabs opened</p>
-                <p>Average time per active tab</p>
+                <Divider>Content</Divider>
+                <p>Calculations need to be updated - currently total visits attributed to last visit date.</p>
+                <Table
+                  columns={this.stats_columns}
+                  dataSource={contentTableData}
+                  size="small"
+                  width='400px'
+                  pagination={false}
+                >
+                </Table>
                 <Divider>Search</Divider>
-                <p>Bounce rate</p>
-                <p>Total searches</p>
-                <p>Total clicks</p>
-                <p>Total bounce clicks</p>
-                <p>Total not bounced clicks</p>
-                <p>Average clicks per search</p>
+                <Table
+                  columns={this.stats_columns}
+                  dataSource={searchTableData}
+                  size="small"
+                  width='400px'
+                  pagination={false}
+                >
+                </Table>
               </TabPane>
               <TabPane tab="History" key="history">
                 <Input.Search
@@ -204,7 +253,7 @@ class App extends Component {
                   onChange={e => this.search(e.target.value)}
                 />
                 <Table
-                  columns={this.columns}
+                  columns={this.history_columns}
                   dataSource={filteredHistory ? filteredHistory : history}
                   size="small"
                   onChange={this.onChange}

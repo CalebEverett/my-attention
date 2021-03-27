@@ -20,13 +20,12 @@ jobs:
     - name: Zip build folder and release
       run: zip -r release.zip build
     - name: Release zip
+      if: false
       uses: ncipollo/release-action@v1
       with:
-        tag: v0.0.1
+        tag: v0.0.2
         commit: master
         artifacts: "release.zip"
-        replacesArtifacts: true
-        allowUpdates: true
         token: ${{ secrets.GITHUB_TOKEN }}
 
     

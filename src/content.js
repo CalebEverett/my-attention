@@ -30,7 +30,6 @@ app.style.display = "none";
 
 chrome.runtime.onMessage.addListener(
   (request, sender, sendResponse) => {
-    console.log(request.message)
     switch (request.message) {
       case "clicked_browser_action":
         togglePopUp();
