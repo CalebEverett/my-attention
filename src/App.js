@@ -26,8 +26,8 @@ class App extends Component {
 
     chrome.runtime.sendMessage(
       message,
-      (response) => {
-        const data = response.history.map((item, index) => ({
+      (history) => {
+        const data = history.map((item, index) => ({
           key: index,
           title: item.title,
           url: item.url,
@@ -35,7 +35,6 @@ class App extends Component {
           last: item.lastVisitTime
         }));
         this.setState({ history: data });
-        this.getContentStats();
         this.getTimeStats();
         this.getSearchStats();
       }
@@ -47,37 +46,21 @@ class App extends Component {
     return { key, stat, day, week, month, year }
   };
 
-  getContentStats = () => {
-    const pageCounts = this.statRow('pageCounts', "Total pages viewed")
 
-    const day = Date.now() - 1000 * 60 * 60 * 24;
-    const week = Date.now() - 1000 * 60 * 60 * 24 * 7;
-    const month = Date.now() - 1000 * 60 * 60 * 24 * 30;
-    const year = Date.now() - 1000 * 60 * 60 * 24 * 365;
+  getContentData = () => {
+    const message = {
+      from: 'app',
+      message: "get_content_data",
+    };
 
-    this.state.history.forEach(h => {
-      if (h.last > day) { pageCounts.day += h.visits; };
-      if (h.last > week) { pageCounts.week += h.visits; };
-      if (h.last > month) { pageCounts.month += h.visits; };
-      if (h.last > year) { pageCounts.year += h.visits; };
-    });
+    chrome.runtime.sendMessage(
+      message,
+      (contentData) => { this.setState({ contentData }); console.log(this.state.contentData); }
+    );
+  }
 
-    const contentData = this.state.contentData
-
-    contentData.pageCounts = pageCounts
-
-    const contentPlaceHolders = [
-      this.statRow('pagesNotBounced', "Pages viewed not bounced"),
-      this.statRow('newPages', "New pages viewed not bounced"),
-      this.statRow('oldPages', "Previously visited pages viewed not bounced"),
-      this.statRow('tabsOpened', "Tabs opened"),
-      this.statRow('avgTimePerTab', "Average active time per active")
-    ]
-
-    contentPlaceHolders.forEach(row => { contentData[row.key] = row })
-
-    this.setState({ contentData })
-
+  statRow = (key, stat, day = 0, week = 0, month = 0, year = 0) => {
+    return { key, stat, day, week, month, year }
   };
 
   getTimeStats = () => {
@@ -183,10 +166,25 @@ class App extends Component {
 
   componentDidMount() {
     this.getHistory();
+    this.getContentData();
+
   };
 
   onChange = (pagination, filters, sorter, extra) => {
     console.log('params', pagination, filters, sorter, extra);
+  }
+
+  getStatsTable = (title, tableData) => {
+    return <div><Divider>{title}</Divider>
+      <Table
+        columns={this.stats_columns}
+        dataSource={tableData}
+        size="small"
+        width='400px'
+        pagination={false}
+      >
+      </Table>
+    </div>
   }
 
   render() {
@@ -218,34 +216,9 @@ class App extends Component {
           <Col span={24}>
             <Tabs defaultActiveKey="statistics">
               <TabPane tab="Statistics" key="stats">
-                <Divider>Time</Divider>
-                <Table
-                  columns={this.stats_columns}
-                  dataSource={timeTableData}
-                  size="small"
-                  width='400px'
-                  pagination={false}
-                >
-                </Table>
-                <Divider>Content</Divider>
-                <p>Calculations need to be updated - currently total visits attributed to last visit date.</p>
-                <Table
-                  columns={this.stats_columns}
-                  dataSource={contentTableData}
-                  size="small"
-                  width='400px'
-                  pagination={false}
-                >
-                </Table>
-                <Divider>Search</Divider>
-                <Table
-                  columns={this.stats_columns}
-                  dataSource={searchTableData}
-                  size="small"
-                  width='400px'
-                  pagination={false}
-                >
-                </Table>
+                {this.getStatsTable("Time", timeTableData)}
+                {this.getStatsTable("Content", contentTableData)}
+                {this.getStatsTable("Search", searchTableData)}
               </TabPane>
               <TabPane tab="History" key="history">
                 <Input.Search

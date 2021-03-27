@@ -63,16 +63,16 @@ const toggleHighlight = (highlight) => {
       from: 'app',
       message: "get_history",
     },
-    (response) => {
+    (history) => {
       const pages = [];
 
-      for (var h of response.history) {
+      history.forEach(h => {
         const url = new URL(h.url)
         const page = url.protocol + "//" + url.pathname
         if (!pages.includes(page)) {
           pages.push(page);
         };
-      };
+      });
 
       var anchors = document.getElementsByTagName('a');
 
