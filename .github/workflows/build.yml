@@ -20,7 +20,7 @@ jobs:
     - name: Zip build folder and release
       run: zip -r release.zip build
     - name: Release zip
-      if: false
+      if: true
       uses: ncipollo/release-action@v1
       with:
         tag: v0.0.2
