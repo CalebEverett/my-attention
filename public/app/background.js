@@ -14,7 +14,7 @@ chrome.browserAction.onClicked.addListener(
 
 const historyStart = Date.now() - 365 * 24 * 60 * 60 * 1000
 
-const getHistory = (startTime, maxResults = 500) => {
+const getHistory = (startTime, maxResults = 10000) => {
    return new Promise((resolve, reject) => {
       try {
          chrome.history.search({ text: '', startTime, maxResults },
@@ -78,7 +78,7 @@ const contentData = {};
 getContentData();
 
 chrome.runtime.onMessage.addListener(
-   function (request, sender, sendResponse) {
+   (request, sender, sendResponse) => {
       console.log(request.message);
       switch (request.message) {
          case "get_history":

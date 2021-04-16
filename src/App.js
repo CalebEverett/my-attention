@@ -46,7 +46,6 @@ class App extends Component {
     return { key, stat, day, week, month, year }
   };
 
-
   getContentData = () => {
     const message = {
       from: 'app',
@@ -55,8 +54,9 @@ class App extends Component {
 
     chrome.runtime.sendMessage(
       message,
-      (contentData) => { this.setState({ contentData }); console.log(this.state.contentData); }
+      (contentData) => { this.setState({ contentData }); }
     );
+
   }
 
   statRow = (key, stat, day = 0, week = 0, month = 0, year = 0) => {
@@ -167,7 +167,6 @@ class App extends Component {
   componentDidMount() {
     this.getHistory();
     this.getContentData();
-
   };
 
   onChange = (pagination, filters, sorter, extra) => {
